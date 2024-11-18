@@ -3,33 +3,30 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { ScreenContent } from '~/components/ScreenContent';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+//import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState } from 'react';
 
+import { useMMKV, useMMKVString } from 'react-native-mmkv';
 
 export default function Home() {
 
   const [storageEmail, setStorageEmail] = useState(null)
   const [storageCode, setStorageCode] = useState(null)
   const [storageUrlApi, setStorageUrlApi] = useState(null)
+  const [storageAccessToken, setStorageAccessToken] = useState(null)
 
-  var globalTest = null;
+  const globalStorage = useMMKV()
+  const dataStorage = useMMKV({ id: 'myapp' })
 
-  const getData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('my-key');
-      if (value !== null) {
-        setStorageUrlApi(value)
-      }
-    } catch (e) {
-      console.log('value_error')
-    }
-  };
+  const [settingsDataApp, setSettingsDataApp] = useMMKVString('dataApp', dataStorage)
 
   function test(){
-    getData();
-    console.log('esse_tested')
-    console.log(storageUrlApi)
+    //getData();
+    console.log('****************')
+
+    const _settingsDataApp = JSON.parse(settingsDataApp)
+
+    console.log('pegou certo - ',_settingsDataApp)
   }
 
   return (

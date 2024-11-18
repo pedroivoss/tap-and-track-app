@@ -3,7 +3,11 @@ import { useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 //import { ScreenContent } from '~/components/ScreenContent';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+//import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { MMKV } from 'react-native-mmkv'
+
+const storage = new MMKV({ id:'myapp'})
 
 export default function Home() {
 
@@ -12,6 +16,7 @@ export default function Home() {
   const [email, setEmail] = useState(null)
   const [code, setCode] = useState(null)
   const [urlApi, setUrlApi] = useState(null)
+  const [accessToken, setAccessToken] = useState(null)
 
   const validateEmail = (email) => {
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
@@ -22,22 +27,23 @@ export default function Home() {
     }
   }
 
-
-  const storeData = async (value) => {
-    try {
-      await AsyncStorage.setItem('my-key', value);
-      console.log('deu bom - settings')
-    } catch (e) {
-      console.log('deu ruim - settings')
-    }
-  };
-
   function testAndSaveSettingsHandler(){
+    //realiza o fech e tras o AccessToken
+    //variavel AccessToken com valores temporarios
+    const accessToken = 'tokasdfnaosdfh32890fuqw84fsadf'
+    storage.set('dataApp', JSON.stringify({email, code, urlApi, accessToken}))
 
-    let valUrlApi = urlApi
-    console.log(urlApi)
+    console.log('****************')
 
-    storeData(valUrlApi)
+    const dataStorage = JSON.parse(storage.getString('dataApp'))
+
+    setEmail(dataStorage.email)
+    setCode(dataStorage.code)
+    setUrlApi(dataStorage.urlApi)
+
+    console.log(dataStorage)
+
+    //storeData(valUrlApi)
 
     /*
       setIsLoading(true)
