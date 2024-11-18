@@ -3,6 +3,8 @@ import { Link, Tabs } from 'expo-router';
 import { HeaderButton } from '../../components/HeaderButton';
 import { TabBarIcon } from '../../components/TabBarIcon';
 
+//https://flatuicolors.com/palette/us
+
 export default function TabLayout() {
   return (
     <Tabs
@@ -13,28 +15,28 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Register',
-          tabBarIcon: ({ color }) => <TabBarIcon /*size={28}*/ name="home" color={color} />,
-          headerRight: () => (
+          tabBarIcon: ({ color }) => <TabBarIcon name="clock-o" color={color} />,
+          /*headerRight: () => (
             <Link href="/modal" asChild>
               <HeaderButton />
             </Link>
-          ),
+          ),*/
         }}
       />
 
       <Tabs.Screen
-        name="historical"
+        name="list"
         options={{
-          title: 'historical',
-          tabBarIcon: ({ color }) => <TabBarIcon name="contao" color={color} />,
+          title: 'list',
+          tabBarIcon: ({ color }) => <TabBarIcon name="list-alt" color={color} />,
         }}
       />
 
       <Tabs.Screen
-        name="two"
+        name="settings"
         options={{
-          title: 'Config',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Settings',
+          tabBarIcon: ({ color }) => <TabBarIcon name="gear" color={color} />,
         }}
       />
     </Tabs>

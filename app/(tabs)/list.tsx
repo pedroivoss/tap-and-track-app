@@ -6,9 +6,9 @@ import { ScreenContent } from '~/components/ScreenContent';
 export default function Home() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Config' }} />
+      <Stack.Screen options={{ title: 'List' }} />
       <View style={styles.container}>
-        <ScreenContent path="app/(tabs)/two.tsx" title="Configurações do servidor para bater o ponto" />
+        <ScreenContent path="app/(tabs)/list.tsx" title="colocar lista de batidas" />
       </View>
     </>
   );
