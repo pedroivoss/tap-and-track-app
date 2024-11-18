@@ -77,8 +77,8 @@ export default function Home() {
             style={styles.input}
             placeholder="Enter your email"
             placeholderTextColor="#b2bec3"
-            //value={email}
-            //onChangeText={setEmail}
+            value={email}
+            onChangeText={setEmail}
             autoFocus={true}
           />
 
@@ -86,8 +86,8 @@ export default function Home() {
             style={styles.input}
             placeholder="Enter your code"
             placeholderTextColor="#b2bec3"
-            //value={email}
-            //onChangeText={setEmail}
+            value={code}
+            onChangeText={setCode}
             autoFocus={true}
           />
 
@@ -95,8 +95,8 @@ export default function Home() {
             style={styles.input}
             placeholder="Enter url api"
             placeholderTextColor="#b2bec3"
-            //value={email}
-            //onChangeText={setEmail}
+            value={urlApi}
+            onChangeText={setUrlApi}
             autoFocus={true}
           />
 
