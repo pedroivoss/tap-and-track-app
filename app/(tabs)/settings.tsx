@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 //import { ScreenContent } from '~/components/ScreenContent';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export default function Home() {
 
   const [isLoading, setIsLoading] = useState(false)
@@ -20,11 +22,27 @@ export default function Home() {
     }
   }
 
+
+  const storeData = async (value) => {
+    try {
+      await AsyncStorage.setItem('my-key', value);
+      console.log('deu bom - settings')
+    } catch (e) {
+      console.log('deu ruim - settings')
+    }
+  };
+
   function testAndSaveSettingsHandler(){
+
+    let valUrlApi = urlApi
+    console.log(urlApi)
+
+    storeData(valUrlApi)
+
     /*
       setIsLoading(true)
 
-      setDisabledButtonLogin(true)
+      setDisabledButtonLogin(true)asdfasdf
       setTxtButtonLogin('Loading...')
       setColorButtonLogin('#3498db')
 
