@@ -20,13 +20,20 @@ export default function Home() {
 
   const [settingsDataApp, setSettingsDataApp] = useMMKVString('dataApp', dataStorage)
 
-  function test(){
+  function checkLoginSettings(){
     //getData();
     console.log('****************')
 
-    const _settingsDataApp = JSON.parse(settingsDataApp)
+    if(null == settingsDataApp || undefined == settingsDataApp){
+      console.log('sem registro')
+    }else{
+      const _settingsDataApp = JSON.parse(settingsDataApp)
+      console.log('pegou certo - ',_settingsDataApp.dataApp.token)
+    }
+  }//fim checkLoginSettings
 
-    console.log('pegou certo - ',_settingsDataApp)
+  function test(){
+    checkLoginSettings()
   }
 
   return (

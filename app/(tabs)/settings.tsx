@@ -1,102 +1,141 @@
 import { Stack } from 'expo-router';
-import { useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import axios from "axios";
 //import { ScreenContent } from '~/components/ScreenContent';
 
 //import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { MMKV } from 'react-native-mmkv'
+import { MMKV, useMMKV, useMMKVString } from 'react-native-mmkv'
 
 const storage = new MMKV({ id:'myapp'})
 
 export default function Home() {
 
   const [isLoading, setIsLoading] = useState(false)
+  const [isLogin, setIsLogin] = useState(false)
 
   const [email, setEmail] = useState(null)
   const [code, setCode] = useState(null)
   const [urlApi, setUrlApi] = useState(null)
   const [accessToken, setAccessToken] = useState(null)
 
-  const validateEmail = (email) => {
-    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
-    if (reg.test(email) === false) {
-      return false;
-    } else {
-      return true;
+  const [currentClientName, setCurrentClientName] = useState(null)
+  const [currentName, setCurrentName] = useState(null)
+  const [currentEmail, setCurrentEmail] = useState(null)
+  const [currentUrlApi, setCurrentUrlApi] = useState(null)
+
+  const [valStorageData, alStorageData] = useState(null)
+
+  const dataStorage = useMMKV({ id: 'myapp' })
+  const [settingsDataApp, setSettingsDataApp] = useMMKVString('dataApp', dataStorage)
+
+  const chckStorage = () => {
+    console.log(settingsDataApp)
+    if(null == settingsDataApp || undefined == settingsDataApp){
+      console.log('ele não tentfou')
+
+      setCurrentClientName(null)
+      setCurrentName(null)
+      setCurrentEmail(null)
+      setCurrentUrlApi(null)
+    }else{
+      const valDataStorage = JSON.parse(storage.getString('dataApp'))
+      console.log('ele tentfou')
+      setCurrentClientName(valDataStorage.dataApp.clientName)
+      setCurrentName(valDataStorage.dataApp.user.name)
+      setCurrentEmail(valDataStorage.dataApp.user.email)
+      setCurrentUrlApi(valDataStorage.urlApi)
     }
-  }
 
-  function testAndSaveSettingsHandler(){
-    //realiza o fech e tras o AccessToken
-    //variavel AccessToken com valores temporarios
-    const accessToken = 'tokasdfnaosdfh32890fuqw84fsadf'
-    storage.set('dataApp', JSON.stringify({email, code, urlApi, accessToken}))
+  }//fim chckStorage
 
-    console.log('****************')
+  useEffect(() => {
+    chckStorage()
+  },[])
 
-    const dataStorage = JSON.parse(storage.getString('dataApp'))
+  function testAndSaveSettingsHandle(){
+    //send request to server to authenticate
+    let password = code
 
-    setEmail(dataStorage.email)
-    setCode(dataStorage.code)
-    setUrlApi(dataStorage.urlApi)
+    if (null == urlApi || null == urlApi || '' == urlApi ||
+       '' == code || false == code || false == code ||
+      '' == email || false == email || false == email ) {
+      Alert.alert('Empty details')
+      return
+    }
 
-    console.log(dataStorage)
+    axios.post(`${urlApi}/loginApi`, {
+      email, password
+    }).then(res => {
 
-    //storeData(valUrlApi)
+      const resData = res.data
 
-    /*
-      setIsLoading(true)
+      console.log(resData)
 
-      setDisabledButtonLogin(true)asdfasdf
-      setTxtButtonLogin('Loading...')
-      setColorButtonLogin('#3498db')
+      if (true == resData.success) {
+        //set the data
+        const dataApp = resData.data
 
-      if (null == email || null == password || '' == email || '' == password || false == email || false == password) {
-        setMessageError('Empty details')
-        setIsLoading(false)
-        setDisabledButtonLogin(false)
-        setTxtButtonLogin('Login')
-        setColorButtonLogin('#5352ed')
-        return
+        storage.set('dataApp', JSON.stringify({
+          dataApp,
+          urlApi
+        }))
+        const valDataStorage = storage.getString('dataApp')
+
+        setSettingsDataApp(valDataStorage)
+
+        chckStorage()
+
+        setIsLogin(true)
+
+        Alert.alert(resData.message)
+
+      } else {
+        Alert.alert(resData.message)
       }
+    }).catch(error => {
+      console.log(error)
+    })
 
-      setMessageError(null)
+  }//fim testAndSaveSettingsHandle
 
-      //send request to server to authenticate
-      await axios.post(`${base_url}/loginApi`, {
-        email, password
-      }).then(res => {
+  function clearSettingsHandle(){
 
-        const resData = res.data
+    if(null == settingsDataApp || undefined == settingsDataApp){
+      console.log('no data')
+    }else{
+      storage.clearAll()
+      setIsLogin(false);
+    }
 
-        //console.log(resData)
-
-        if (true == res.data.success) {
-          //set the data
-          setAuthdata(resData.data)
-          //navigate to profile with data
-          //navigation.navigate("Profile");
-        } else {
-          setIsLoading(false)
-          setAuthdata(resData.success)
-          setMessageError(resData.message)
-          setDisabledButtonLogin(false)
-          setTxtButtonLogin('Login')
-          setColorButtonLogin('#5352ed')
-        }
-      }).catch(error => {
-        console.log(error)
-      })
-    */
-  }
+  }//fim clearSettingsHandle
 
   return (
     <>
       <Stack.Screen options={{ title: 'Settings' }} />
       <SafeAreaView  style={styles.container}>
+
+      <View style={styles.contentPadding}></View>
+      {(true == isLogin) &&
+        <View style={styles.content}>
+          <Text style={styles.title}>Current Settings</Text>
+
+          <Text style={styles.txtCt}>Company: {currentClientName}</Text>
+          <Text style={styles.txtCt}>Your Name: {currentName}</Text>
+          <Text style={styles.txtCt}>Your Email: {currentEmail}</Text>
+          <Text style={styles.txtCt}>API: {currentUrlApi}</Text>
+          <View style={styles.hr} />
+          <View style={{ paddingBottom: 15}} />
+
+          <TouchableOpacity onPress={clearSettingsHandle} style={styles.buttonDanger}>
+            <Text style={styles.buttonText}>Clean Settings</Text>
+          </TouchableOpacity>
+        </View>
+      }
         <View style={styles.contentPadding}></View>
         <View style={styles.content}>
+        <Text style={styles.title}>Setup Settings</Text>
           <TextInput
             style={styles.input}
             placeholder="Enter your email"
@@ -124,7 +163,7 @@ export default function Home() {
             autoFocus={true}
           />
 
-          <TouchableOpacity onPress={testAndSaveSettingsHandler} style={styles.button}>
+          <TouchableOpacity onPress={testAndSaveSettingsHandle} style={styles.button}>
             <Text style={styles.buttonText}>Test & Save</Text>
           </TouchableOpacity>
 
@@ -158,6 +197,9 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     backgroundColor: '#2d3436',
   },
+  txtCt: {
+    paddingBottom: 5,
+  },
   authContainer: {
     backgroundColor: '#fff',
     width: '80%',
@@ -174,7 +216,14 @@ const styles = StyleSheet.create({
     elevation: 5
   },
   button: {
-    backgroundColor: '#5352ed',
+    backgroundColor: '#0984e3',
+    //backgroundColor: colorButtonLogin,
+    paddingVertical: 10,
+    borderRadius: 5,
+    alignItems: 'center'
+  },
+  buttonDanger: {
+    backgroundColor: '#e17055',
     //backgroundColor: colorButtonLogin,
     paddingVertical: 10,
     borderRadius: 5,
@@ -193,4 +242,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 10
   },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center'
+  },
+  hr: {
+    borderBottomColor: 'black',
+    borderBottomWidth: 1,
+    marginLeft: 5,
+    marginRight: 5,
+    paddingBottom: 10,
+  }
 });
