@@ -137,20 +137,19 @@ const clearSettingsHandle = () => {
     if(null == settingsDataApp || undefined == settingsDataApp){
       console.log('no data')
     }else{
-      console.log(settingsDataApp)
-      console.log(accessToken)
-
       const authDataToken = accessToken
 
-      axios.post(`${urlApi}/logoutApi`, {
+      axios.post(`${currentUrlApi}/logoutApi`, {
         authDataToken
       }).then(res => {
 
         const resData = res.data
 
-
         if (true == resData.success) {
-          storage.clearAll()
+          //storage.clearAll()
+          console.log('noddd data')
+
+          storage.delete('dataApp')
           setIsLogin(false);
         }
 
@@ -163,6 +162,36 @@ const clearSettingsHandle = () => {
     }
 
   }//fim clearSettingsHandle
+
+  function testeCriar(){
+
+       const text = "{'firstName':'Pedro','lastName':'a' }|{'firstName':'Joao','lastName':'b' }|{'firstName':'Katryanne','lastName':'c' }|{'firstName':'Jose','lastName':'d' }";
+
+      const data = text
+
+      storage.set('listDataLocal', data)
+
+  }
+
+  function testeMostrar(){
+    //const buffer = storage.getBuffer('CreateTeste')
+    //console.log(buffer) // [1, 100, 255]
+    const data = storage.getString('listDataLocal')
+console.log(data)
+    /*console.log('*-*-*-*-*-*-*-*AGORA')
+    const myArray = data.split("|");
+    for (let i = 0; i < myArray.length; i++) {
+      console.log(myArray[i])
+    }*/
+
+    //const keys = storage.getAllKeys()
+    //console.log('*-*-*-*-*-*-*-*')
+    //console.log(keys)
+  }
+
+  function testeApagar(){
+    storage.delete('listDataLocal')
+  }
 
   return (
     <>
@@ -225,6 +254,31 @@ const clearSettingsHandle = () => {
             </TouchableOpacity>
 
           </View>
+
+
+
+          <View style={styles.contentPadding}></View>
+          <View style={styles.content}>
+            <Text style={styles.title}>testes</Text>
+
+            <TouchableOpacity onPress={testeCriar} style={styles.buttonDanger}>
+              <Text style={styles.buttonText}>Criar</Text>
+            </TouchableOpacity>
+          <View style={styles.contentPadding}></View>
+
+            <TouchableOpacity onPress={testeMostrar} style={styles.buttonDanger}>
+              <Text style={styles.buttonText}>Mostrar</Text>
+            </TouchableOpacity>
+          <View style={styles.contentPadding}></View>
+
+            <TouchableOpacity onPress={testeApagar} style={styles.buttonDanger}>
+              <Text style={styles.buttonText}>Apagar</Text>
+            </TouchableOpacity>
+          </View>
+
+
+
+
         </ScrollView>
       </SafeAreaView>
     </>
@@ -256,7 +310,7 @@ const styles = StyleSheet.create({
   },
   contentPadding: {
     paddingBottom: 20,
-    backgroundColor: '#2d3436',
+    //backgroundColor: '#2d3436',
   },
   txtCt: {
     paddingBottom: 5,

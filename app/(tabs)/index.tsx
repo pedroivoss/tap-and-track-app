@@ -37,6 +37,8 @@ export default function Home() {
 
   const [settingsDataApp, setSettingsDataApp] = useMMKVString('dataApp', dataStorage)
 
+  const [storageListDataLocal, setStorageListDataLocal] = useMMKVString('listDataLocal', dataStorage)
+
   const [valueStore, setValueStore] = useState(null);
   const [statusEnableObs, setStatusEnableObs] = useState(0);
   const [isFocus, setIsFocus] = useState(false);
@@ -293,41 +295,78 @@ export default function Home() {
   }*/
 
   async function saveDataLocation() {
-            let oldTxtButtonSave = txtButtonSave
-            let oldColorButtonSave = colorButtonSave
-            let oldDisabledButtonSave = disabledButtonSave
 
-            setTxtButtonSave('Saving data...')
-            setColorButtonSave('#3498db')
-            setDisabledButtonSave(true)
+    let oldTxtButtonSave = txtButtonSave
+    let oldColorButtonSave = colorButtonSave
+    let oldDisabledButtonSave = disabledButtonSave
 
-            var latitude = valLatitude
-            var longitude = valLongitude
-            var device = 'app'
+    setTxtButtonSave('Saving data...')
+    setColorButtonSave('#3498db')
+    setDisabledButtonSave(true)
 
-            if(null == latitude || null == longitude || '' == latitude || '' == longitude || false == latitude || false == longitude || 'waiting' == latitude || 'waiting' == longitude){
-                Alert.alert('Unable to determine your location. Please log out and log back in to refresh the app.')
-                setTxtButtonSave(oldTxtButtonSave)
-                setColorButtonSave(oldColorButtonSave)
-                setDisabledButtonSave(oldDisabledButtonSave)
-              return
-            }
+    var latitude = valLatitude
+    var longitude = valLongitude
+    var device = 'app'
+    const timestamp = moment().format('YYYY-MM-DD H:mm:ss');
 
-            if(2 == statusEnableObs && (null == obsDescription || '' == obsDescription || false == obsDescription)){
+    if(null == latitude || null == longitude || '' == latitude || '' == longitude || false == latitude || false == longitude || 'waiting' == latitude || 'waiting' == longitude){
+        Alert.alert('Unable to determine your location. Please log out and log back in to refresh the app.')
+        setTxtButtonSave(oldTxtButtonSave)
+        setColorButtonSave(oldColorButtonSave)
+        setDisabledButtonSave(oldDisabledButtonSave)
+      return
+    }
+
+    //se não estiver logado no settings
+
+    let data = ``;
+    let ifLocal = 0
+
+    if(false != ifLogin){
+      ifLocal = 1
+    }
+
+    if(null != storageListDataLocal && undefined != storageListDataLocal){
+
+      const dataStorageCurrent = dataStorage.getString('listDataLocal')
+
+      let newData = `{'latitude':'${latitude}','longitude':'${longitude}', 'timestamp':'${timestamp}', 'Local': '${ifLocal}'}`
+
+      data = `${newData}|${dataStorageCurrent}`
+
+      dataStorage.set('listDataLocal', data)
+
+      if(false == ifLogin){
+        setTxtButtonSave(oldTxtButtonSave)
+        setColorButtonSave(oldColorButtonSave)
+        setDisabledButtonSave(oldDisabledButtonSave)
+
+      }
+      console.log('bucetao')
+      return
+    }else{
+      let newData = `{'latitude':'${latitude}','longitude':'${longitude}', 'timestamp':'${timestamp}', 'Local': '${ifLocal}'}`
+
+      let data = `${newData}`
+
+      dataStorage.set('listDataLocal', data)
+    }
+
+
+
+    if(2 == statusEnableObs && (null == obsDescription || '' == obsDescription || false == obsDescription)){
                 Alert.alert('the Obs is empty')
                 setTxtButtonSave(oldTxtButtonSave)
                 setColorButtonSave(oldColorButtonSave)
                 setDisabledButtonSave(oldDisabledButtonSave)
                 return
-            }
+    }
 
-            const timestamp = moment().format('YYYY-MM-DD H:mm:ss');
+    const authDataToken = storageAccessToken
+    const authDataUserId = storageIdUser
+    const code = valStoreCode;
 
-            const authDataToken = storageAccessToken
-            const authDataUserId = storageIdUser
-            const code = valStoreCode;
-
-            axios.post(`${storageUrlApi}/storeCheckIn`,{
+    axios.post(`${storageUrlApi}/storeCheckIn`,{
                 location,
                 type,
                 code,
@@ -339,7 +378,7 @@ export default function Home() {
                 device,
                 authDataToken,
                 authDataUserId
-              }).then(res=>{
+      }).then(res=>{
 
                 const resData = res.data
 
@@ -353,15 +392,14 @@ export default function Home() {
                 }else{
                      Alert.alert(res.data.message)
                 }
-            }).catch(error =>{
-                Alert.alert('Network Error: Please check your network connection')
-            })
-        //});
+    }).catch(error =>{
+        Alert.alert('Network Error: Please check your network connection')
+    })
   }
 
   const AskToDoCheckInHandle = () => {
 
-        if((null == valueStore || false == valueStore || '' == valueStore) && ('checkIn' == type)){
+        if((null == valueStore || false == valueStore || '' == valueStore) && ('checkIn' == type && true == ifLogin)){
              Alert.alert('Please select a job')
              return
         }
@@ -407,14 +445,15 @@ export default function Home() {
   const checkIfLoginValidaToken = () => {
     if(null != storageAccessToken){
       const authDataToken = storageAccessToken
+      console.log('checkIfLoginValidaToken')
+      console.log(authDataToken)
 
       axios.post(`${storageUrlApi}/checkTokenValid`, {
         authDataToken
       }).then(res => {
 
         const resData = res.data
-
-        if (true != resData.success) {
+        if (true != resData.success && true == ifLogin) {
           //Your session is invalid. Please close and reopen the app to refresh
           Alert.alert(resData.message)
         }
@@ -490,9 +529,17 @@ export default function Home() {
             <Text>Latitude: {valLatitude}</Text>
             <Text>Longitude: {valLongitude}</Text>
             <View style={styles.contentPadding}></View>
-            <View style={styles.hr} />
-            <View style={styles.contentPadding}></View>
-
+            {(true == ifLogin) &&
+              <View
+                style={{
+                    borderBottomColor: 'black',
+                    borderBottomWidth: StyleSheet.hairlineWidth,
+                }}
+              />
+            }
+            {(true == ifLogin) &&
+              <View style={styles.contentPadding}></View>
+            }
             {('checkIn' == type && false == disabledButtonSave && 0 == ifAdmin && true == ifLogin) &&
               <View>
                     {renderLabel()}
@@ -529,7 +576,10 @@ export default function Home() {
               </View>
             }
 
-            <View style={styles.contentPadding}></View>
+            {(true == ifLogin) &&
+              <View style={styles.contentPadding}></View>
+            }
+
             {(1 == statusEnableObs && 0 == ifAdmin) &&
               <TextInput
                   style={styles.input}
@@ -558,7 +608,9 @@ export default function Home() {
               />
             }
 
-            <View style={styles.contentPadding}></View>
+            {(true == ifLogin) &&
+              <View style={styles.contentPadding}></View>
+            }
 
             <View
               style={{
