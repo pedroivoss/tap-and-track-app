@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Alert, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, SafeAreaView, ScrollView, StyleSheet, RefreshControl, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import axios from "axios";
 //import { ScreenContent } from '~/components/ScreenContent';
 
@@ -11,6 +11,8 @@ import { MMKV, useMMKV, useMMKVString } from 'react-native-mmkv'
 const storage = new MMKV({ id:'myapp'})
 
 export default function Home() {
+
+  const [refreshing, setRefreshing] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false)
   const [isLogin, setIsLogin] = useState(false)
@@ -30,8 +32,16 @@ export default function Home() {
   const dataStorage = useMMKV({ id: 'myapp' })
   const [settingsDataApp, setSettingsDataApp] = useMMKVString('dataApp', dataStorage)
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+        chckStorage()
+        setRefreshing(false);
+    }, 1000);
+  }, []);
+
   const chckStorage = () => {
-    console.log(settingsDataApp)
+    //console.log(JSON.parse(storage.getString('dataApp'))
     if(null == settingsDataApp || undefined == settingsDataApp){
       setIsLogin(false)
       setCurrentClientName(null)
@@ -42,11 +52,11 @@ export default function Home() {
       const valDataStorage = JSON.parse(storage.getString('dataApp'))
       setIsLogin(true)
       setCurrentClientName(valDataStorage.dataApp.clientName)
+      setAccessToken(valDataStorage.dataApp.token)
       setCurrentName(valDataStorage.dataApp.user.name)
       setCurrentEmail(valDataStorage.dataApp.user.email)
       setCurrentUrlApi(valDataStorage.urlApi)
     }
-
   }//fim chckStorage
 
   useEffect(() => {
@@ -70,7 +80,7 @@ export default function Home() {
 
       const resData = res.data
 
-      console.log(resData)
+      //console.log(resData)
 
       if (true == resData.success) {
         //set the data
@@ -99,13 +109,57 @@ export default function Home() {
 
   }//fim testAndSaveSettingsHandle
 
-  function clearSettingsHandle(){
+const clearSettingsHandle = () => {
+    //setAuthdata(null)
+
+    Alert.alert('Do you really want to logout?', '', [
+        {
+            text: 'Cancel',
+            onPress: () => Alert.alert('Canceled'),
+            style: 'cancel',
+        },
+        {
+            text: 'Yes, I Do',
+            onPress: () => logoutFunction()
+        },
+      ],
+      {
+        cancelable: true,
+        onDismiss: () =>
+          Alert.alert(
+            'This alert was dismissed by tapping outside of the alert dialog.',
+          ),
+      });
+}
+
+  function logoutFunction(){
 
     if(null == settingsDataApp || undefined == settingsDataApp){
       console.log('no data')
     }else{
-      storage.clearAll()
-      setIsLogin(false);
+      console.log(settingsDataApp)
+      console.log(accessToken)
+
+      const authDataToken = accessToken
+
+      axios.post(`${urlApi}/logoutApi`, {
+        authDataToken
+      }).then(res => {
+
+        const resData = res.data
+
+
+        if (true == resData.success) {
+          storage.clearAll()
+          setIsLogin(false);
+        }
+
+        Alert.alert(resData.message)
+      }).catch(error => {
+        console.log(error)
+      })
+      //storage.clearAll()
+      //setIsLogin(false);
     }
 
   }//fim clearSettingsHandle
@@ -114,59 +168,64 @@ export default function Home() {
     <>
       <Stack.Screen options={{ title: 'Settings' }} />
       <SafeAreaView  style={styles.container}>
+        <ScrollView
+            contentContainerStyle={styles.scrollView}
+            refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
+          <View style={styles.contentPadding}></View>
+        {(true == isLogin) &&
+          <View style={styles.content}>
+            <Text style={styles.title}>Current Settings</Text>
 
-      <View style={styles.contentPadding}></View>
-      {(true == isLogin) &&
-        <View style={styles.content}>
-          <Text style={styles.title}>Current Settings</Text>
+            <Text style={styles.txtCt}>Company: {currentClientName}</Text>
+            <Text style={styles.txtCt}>Your Name: {currentName}</Text>
+            <Text style={styles.txtCt}>Your Email: {currentEmail}</Text>
+            <Text style={styles.txtCt}>API: {currentUrlApi}</Text>
+            <View style={styles.hr} />
+            <View style={{ paddingBottom: 15}} />
 
-          <Text style={styles.txtCt}>Company: {currentClientName}</Text>
-          <Text style={styles.txtCt}>Your Name: {currentName}</Text>
-          <Text style={styles.txtCt}>Your Email: {currentEmail}</Text>
-          <Text style={styles.txtCt}>API: {currentUrlApi}</Text>
-          <View style={styles.hr} />
-          <View style={{ paddingBottom: 15}} />
+            <TouchableOpacity onPress={clearSettingsHandle} style={styles.buttonDanger}>
+              <Text style={styles.buttonText}>Clean Settings</Text>
+            </TouchableOpacity>
+          </View>
+        }
+          <View style={styles.contentPadding}></View>
+          <View style={styles.content}>
+          <Text style={styles.title}>Setup Settings</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your email"
+              placeholderTextColor="#b2bec3"
+              value={email}
+              onChangeText={setEmail}
+              autoFocus={true}
+            />
 
-          <TouchableOpacity onPress={clearSettingsHandle} style={styles.buttonDanger}>
-            <Text style={styles.buttonText}>Clean Settings</Text>
-          </TouchableOpacity>
-        </View>
-      }
-        <View style={styles.contentPadding}></View>
-        <View style={styles.content}>
-        <Text style={styles.title}>Setup Settings</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your email"
-            placeholderTextColor="#b2bec3"
-            value={email}
-            onChangeText={setEmail}
-            autoFocus={true}
-          />
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your code"
+              placeholderTextColor="#b2bec3"
+              value={code}
+              onChangeText={setCode}
+              autoFocus={true}
+            />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your code"
-            placeholderTextColor="#b2bec3"
-            value={code}
-            onChangeText={setCode}
-            autoFocus={true}
-          />
+            <TextInput
+              style={styles.input}
+              placeholder="Enter url api"
+              placeholderTextColor="#b2bec3"
+              value={urlApi}
+              onChangeText={setUrlApi}
+              autoFocus={true}
+            />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Enter url api"
-            placeholderTextColor="#b2bec3"
-            value={urlApi}
-            onChangeText={setUrlApi}
-            autoFocus={true}
-          />
+            <TouchableOpacity onPress={testAndSaveSettingsHandle} style={styles.button}>
+              <Text style={styles.buttonText}>Test & Save</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity onPress={testAndSaveSettingsHandle} style={styles.button}>
-            <Text style={styles.buttonText}>Test & Save</Text>
-          </TouchableOpacity>
-
-        </View>
+          </View>
+        </ScrollView>
       </SafeAreaView>
     </>
   );
@@ -176,6 +235,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     //padding: 24,
+    backgroundColor: '#2d3436',
+  },
+  scrollView: {
     backgroundColor: '#2d3436',
     alignItems: 'center',
     justifyContent: 'center',

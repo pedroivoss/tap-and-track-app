@@ -16,11 +16,6 @@ export default function TabLayout() {
         options={{
           title: 'Register',
           tabBarIcon: ({ color }) => <TabBarIcon name="clock-o" color={color} />,
-          /*headerRight: () => (
-            <Link href="/modal" asChild>
-              <HeaderButton />
-            </Link>
-          ),*/
         }}
       />
 
@@ -37,6 +32,11 @@ export default function TabLayout() {
         options={{
           title: 'Settings',
           tabBarIcon: ({ color }) => <TabBarIcon name="gear" color={color} />,
+          headerRight: () => (
+            <Link href="/modal" asChild>
+              <HeaderButton />
+            </Link>
+          ),
         }}
       />
     </Tabs>
