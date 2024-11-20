@@ -33,15 +33,14 @@ export default function Home() {
   const chckStorage = () => {
     console.log(settingsDataApp)
     if(null == settingsDataApp || undefined == settingsDataApp){
-      console.log('ele não tentfou')
-
+      setIsLogin(false)
       setCurrentClientName(null)
       setCurrentName(null)
       setCurrentEmail(null)
       setCurrentUrlApi(null)
     }else{
       const valDataStorage = JSON.parse(storage.getString('dataApp'))
-      console.log('ele tentfou')
+      setIsLogin(true)
       setCurrentClientName(valDataStorage.dataApp.clientName)
       setCurrentName(valDataStorage.dataApp.user.name)
       setCurrentEmail(valDataStorage.dataApp.user.email)
