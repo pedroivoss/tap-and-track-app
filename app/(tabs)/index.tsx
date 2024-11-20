@@ -99,7 +99,7 @@ export default function Home() {
           }).then(res=>{
 
             const resData = res.data
-            console.log(resData)
+
             if(true == res.data.success){
                 setDataListStore(resData.data.ListStoreAll)
             }
@@ -558,31 +558,48 @@ export default function Home() {
               />
             }
 
-              <View style={styles.contentPadding}></View>
+            <View style={styles.contentPadding}></View>
 
-              <View
-                style={{
-                    borderBottomColor: 'black',
-                    borderBottomWidth: StyleSheet.hairlineWidth,
-                }}
-              />
-                {(0 == ifAdmin) &&<View style={styles.contentPadding}></View>}
+            <View
+              style={{
+                  borderBottomColor: 'black',
+                  borderBottomWidth: StyleSheet.hairlineWidth,
+              }}
+            />
+            {(0 == ifAdmin) &&<View style={styles.contentPadding}></View>}
 
-                {(0 == ifAdmin) &&
-                <TouchableOpacity
-                disabled={disabledButtonSave}
-                onPress={AskToDoCheckInHandle}
-                style={{
-                    //backgroundColor: '#2ecc71',
-                    backgroundColor: colorButtonSave,
-                    paddingVertical: 10,
-                    borderRadius: 5,
-                    alignItems: 'center'
-                }}>
-                        <Text style={styles.buttonText}>{txtButtonSave}</Text>
-                    </TouchableOpacity>
-                }
+            {(0 == ifAdmin) &&
+            <TouchableOpacity
+            disabled={disabledButtonSave}
+            onPress={AskToDoCheckInHandle}
+            style={{
+                //backgroundColor: '#2ecc71',
+                backgroundColor: colorButtonSave,
+                paddingVertical: 10,
+                borderRadius: 5,
+                alignItems: 'center'
+            }}>
+                    <Text style={styles.buttonText}>{txtButtonSave}</Text>
+                </TouchableOpacity>
+            }
           </View>
+
+          <View style={styles.contentPadding}></View>
+
+          {('checkOut' == type && 0 == ifAdmin )&&
+              <View style={styles.content}>
+                  <Text style={styles.titleSimple}>Check In data:</Text>
+                  <Text>Store: {valStoreName}</Text>
+                  <Text>Latitude: {valStoreLatitude}</Text>
+                  <Text>Longitude: {valStoreLongitude}</Text>
+                  <Text>timestamp: {valStoreTimestamp}</Text>
+                  {null != valStoreObs &&
+                  <Text>Obs: {valStoreObs}</Text>
+                  }
+              </View>
+            }
+
+
         </ScrollView>
       </SafeAreaView>
       {/*<View style={styles.container}>
@@ -707,5 +724,10 @@ const styles = StyleSheet.create({
   inputSearchStyle: {
     height: 40,
     fontSize: 16,
-  }
+  },
+  titleSimple: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center'
+},
 });
