@@ -87,21 +87,44 @@ export default function Home() {
 
   const getListStoreClient = async () => {
 
-        let _authDataToken = storageAccessToken
-        let _authDataIdClient = storageIdClient
-        let _authDataIdUser = storageIdUser
-      /*console.log('bucetão')
-      console.log(storageAccessToken)
-      console.log(storageIdClient)
-      console.log(storageIdUser)*/
-        await axios.post(`${storageUrlApi}/getListStoreClient`,{
+      //checkLoginSettings()
+      let _authDataToken
+      let _authDataIdClient
+      let _authDataIdUser
+      let _storageUrlApi
+
+        if(null == settingsDataApp || undefined == settingsDataApp){
+          //fazer um lista default ou voltar um alert error
+        }else{
+          console.log('comedor de cu')
+          const _settingsDataApp = JSON.parse(settingsDataApp)
+
+          setIfLogin(true)
+          _authDataToken = _settingsDataApp.dataApp.token
+          _authDataIdClient = _settingsDataApp.dataApp.user.id_client
+          _authDataIdUser = _settingsDataApp.dataApp.user.id
+          _authDataIdUser = _settingsDataApp.dataApp.user.id
+          _storageUrlApi = _settingsDataApp.urlApi
+        }
+
+      //let _authDataToken = storageAccessToken
+      //let _authDataIdClient = storageIdClient
+      //let _authDataIdUser = storageIdUser
+
+      console.log('bucetão')
+      console.log(_authDataToken)
+      console.log(_authDataIdClient)
+      console.log(_authDataIdUser)
+      console.log(_storageUrlApi)
+
+          await axios.post(`${_storageUrlApi}/getListStoreClient`,{
             _authDataToken,
             _authDataIdClient,
             _authDataIdUser
           }).then(res=>{
 
             const resData = res.data
-
+            console.log(resData.data.ListStoreAll)
             if(true == res.data.success){
                 setDataListStore(resData.data.ListStoreAll)
             }
@@ -320,10 +343,10 @@ export default function Home() {
     //se não estiver logado no settings
 
     let data = ``;
-    let ifLocal = 0
+    let ifLocal = 1
 
     if(false != ifLogin){
-      ifLocal = 1
+      ifLocal = 0
     }
 
     if(null != storageListDataLocal && undefined != storageListDataLocal){
@@ -342,8 +365,11 @@ export default function Home() {
         setDisabledButtonSave(oldDisabledButtonSave)
 
       }
-      console.log('bucetao')
-      return
+      
+      if(false == ifLogin){
+        return
+      }
+
     }else{
       let newData = `{'latitude':'${latitude}','longitude':'${longitude}', 'timestamp':'${timestamp}', 'Local': '${ifLocal}'}`
 
@@ -351,8 +377,6 @@ export default function Home() {
 
       dataStorage.set('listDataLocal', data)
     }
-
-
 
     if(2 == statusEnableObs && (null == obsDescription || '' == obsDescription || false == obsDescription)){
                 Alert.alert('the Obs is empty')
@@ -429,9 +453,10 @@ export default function Home() {
       //console.log('sem registro')
       setIfLogin(false)
     }else{
+      console.log('verificou')
       const _settingsDataApp = JSON.parse(settingsDataApp)
       //console.log('pegou certo - ',_settingsDataApp.dataApp.token)
-      //console.log('pegou certo - ',_settingsDataApp)
+      console.log('pegou certo - ',_settingsDataApp.dataApp.user.name)
       setIfLogin(true)
       setStorageNameUser(_settingsDataApp.dataApp.user.name)
       setStorageIdUser(_settingsDataApp.dataApp.user.id)
@@ -485,11 +510,12 @@ export default function Home() {
             return;
         }*/
     }
+
+    getListStoreClient()
     checkIfLoginValidaToken()
     checkLoginSettings()
 
-    getListStoreEmployers()
-    getListStoreClient()
+    //getListStoreEmployers()
     checkCheckIn()
     getPermissions()
 
