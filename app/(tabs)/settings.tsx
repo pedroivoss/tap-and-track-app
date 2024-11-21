@@ -146,7 +146,6 @@ const clearSettingsHandle = () => {
         const resData = res.data
 
         if (true == resData.success) {
-          //storage.clearAll()
           console.log('noddd data')
 
           storage.delete('dataApp')
@@ -157,13 +156,11 @@ const clearSettingsHandle = () => {
       }).catch(error => {
         console.log(error)
       })
-      //storage.clearAll()
-      //setIsLogin(false);
     }
 
   }//fim clearSettingsHandle
 
-  function testeCriar(){
+  /*function testeCriar(){
 
        const text = "{'firstName':'Pedro','lastName':'a' }|{'firstName':'Joao','lastName':'b' }|{'firstName':'Katryanne','lastName':'c' }|{'firstName':'Jose','lastName':'d' }";
 
@@ -174,24 +171,13 @@ const clearSettingsHandle = () => {
   }
 
   function testeMostrar(){
-    //const buffer = storage.getBuffer('CreateTeste')
-    //console.log(buffer) // [1, 100, 255]
     const data = storage.getString('listDataLocal')
-console.log(data)
-    /*console.log('*-*-*-*-*-*-*-*AGORA')
-    const myArray = data.split("|");
-    for (let i = 0; i < myArray.length; i++) {
-      console.log(myArray[i])
-    }*/
-
-    //const keys = storage.getAllKeys()
-    //console.log('*-*-*-*-*-*-*-*')
-    //console.log(keys)
+    console.log(data)
   }
 
   function testeApagar(){
     storage.delete('listDataLocal')
-  }
+  }*/
 
   return (
     <>
@@ -257,10 +243,9 @@ console.log(data)
 
 
 
-          <View style={styles.contentPadding}></View>
+          {/*<View style={styles.contentPadding}></View>
           <View style={styles.content}>
-            <Text style={styles.title}>testes</Text>
-
+            <Text style={styles.title}>Testes</Text>
             <TouchableOpacity onPress={testeCriar} style={styles.buttonDanger}>
               <Text style={styles.buttonText}>Criar</Text>
             </TouchableOpacity>
@@ -274,7 +259,7 @@ console.log(data)
             <TouchableOpacity onPress={testeApagar} style={styles.buttonDanger}>
               <Text style={styles.buttonText}>Apagar</Text>
             </TouchableOpacity>
-          </View>
+          </View>*/}
 
 
 

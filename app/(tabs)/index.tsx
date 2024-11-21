@@ -93,29 +93,19 @@ export default function Home() {
       let _authDataIdUser
       let _storageUrlApi
 
-        if(null == settingsDataApp || undefined == settingsDataApp){
-          //fazer um lista default ou voltar um alert error
-        }else{
-          console.log('comedor de cu')
-          const _settingsDataApp = JSON.parse(settingsDataApp)
+      if(null == settingsDataApp || undefined == settingsDataApp){
+        //fazer um lista default ou voltar um alert error
+      }else{
+        //console.log('comedor de cu')
+        const _settingsDataApp = JSON.parse(settingsDataApp)
 
-          setIfLogin(true)
-          _authDataToken = _settingsDataApp.dataApp.token
-          _authDataIdClient = _settingsDataApp.dataApp.user.id_client
-          _authDataIdUser = _settingsDataApp.dataApp.user.id
-          _authDataIdUser = _settingsDataApp.dataApp.user.id
-          _storageUrlApi = _settingsDataApp.urlApi
-        }
-
-      //let _authDataToken = storageAccessToken
-      //let _authDataIdClient = storageIdClient
-      //let _authDataIdUser = storageIdUser
-
-      console.log('bucetão')
-      console.log(_authDataToken)
-      console.log(_authDataIdClient)
-      console.log(_authDataIdUser)
-      console.log(_storageUrlApi)
+        setIfLogin(true)
+        _authDataToken = _settingsDataApp.dataApp.token
+        _authDataIdClient = _settingsDataApp.dataApp.user.id_client
+        _authDataIdUser = _settingsDataApp.dataApp.user.id
+        _authDataIdUser = _settingsDataApp.dataApp.user.id
+        _storageUrlApi = _settingsDataApp.urlApi
+      }
 
           await axios.post(`${_storageUrlApi}/getListStoreClient`,{
             _authDataToken,
@@ -124,7 +114,7 @@ export default function Home() {
           }).then(res=>{
 
             const resData = res.data
-            console.log(resData.data.ListStoreAll)
+            //console.log(resData.data.ListStoreAll)
             if(true == res.data.success){
                 setDataListStore(resData.data.ListStoreAll)
             }
@@ -353,7 +343,7 @@ export default function Home() {
 
       const dataStorageCurrent = dataStorage.getString('listDataLocal')
 
-      let newData = `{'latitude':'${latitude}','longitude':'${longitude}', 'timestamp':'${timestamp}', 'Local': '${ifLocal}'}`
+      let newData = `{"latitude":"${latitude}","longitude":"${longitude}", "timestamp":"${timestamp}", "Local": "${ifLocal}"}`
 
       data = `${newData}|${dataStorageCurrent}`
 
@@ -365,13 +355,13 @@ export default function Home() {
         setDisabledButtonSave(oldDisabledButtonSave)
 
       }
-      
+
       if(false == ifLogin){
         return
       }
 
     }else{
-      let newData = `{'latitude':'${latitude}','longitude':'${longitude}', 'timestamp':'${timestamp}', 'Local': '${ifLocal}'}`
+      let newData = `{"latitude":"${latitude}","longitude":"${longitude}", "timestamp":"${timestamp}", "Local": "${ifLocal}"}`
 
       let data = `${newData}`
 
@@ -453,10 +443,10 @@ export default function Home() {
       //console.log('sem registro')
       setIfLogin(false)
     }else{
-      console.log('verificou')
+      //console.log('verificou')
       const _settingsDataApp = JSON.parse(settingsDataApp)
       //console.log('pegou certo - ',_settingsDataApp.dataApp.token)
-      console.log('pegou certo - ',_settingsDataApp.dataApp.user.name)
+      //console.log('pegou certo - ',_settingsDataApp.dataApp.user.name)
       setIfLogin(true)
       setStorageNameUser(_settingsDataApp.dataApp.user.name)
       setStorageIdUser(_settingsDataApp.dataApp.user.id)
@@ -470,8 +460,8 @@ export default function Home() {
   const checkIfLoginValidaToken = () => {
     if(null != storageAccessToken){
       const authDataToken = storageAccessToken
-      console.log('checkIfLoginValidaToken')
-      console.log(authDataToken)
+      //console.log('checkIfLoginValidaToken')
+      //console.log(authDataToken)
 
       axios.post(`${storageUrlApi}/checkTokenValid`, {
         authDataToken
@@ -695,7 +685,6 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //padding: 24,
     backgroundColor: '#2d3436',
   },
   scrollView: {
@@ -707,7 +696,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     width: '80%',
     padding: 20,
-    //overflow: 'hidden',
     borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: {
@@ -725,7 +713,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     width: '80%',
     padding: 20,
-    //overflow: 'hidden',
     borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: {
