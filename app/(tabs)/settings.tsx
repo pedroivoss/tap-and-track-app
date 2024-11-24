@@ -146,7 +146,7 @@ const clearSettingsHandle = () => {
         const resData = res.data
 
         if (true == resData.success) {
-          console.log('noddd data')
+          //console.log('no data')
 
           storage.delete('dataApp')
           setIsLogin(false);

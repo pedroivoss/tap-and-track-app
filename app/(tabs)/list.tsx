@@ -17,7 +17,7 @@ export default function Home() {
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
-        getListData()
+        //getListData()
         setRefreshing(false);
     }, 1000);
   }, []);
@@ -84,7 +84,7 @@ export default function Home() {
   }
 
   useEffect(() =>{
-    getListData()
+    //getListData()
   }, [])
 
   const cleanListfunction = () => {

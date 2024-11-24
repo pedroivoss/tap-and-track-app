@@ -235,78 +235,6 @@ export default function Home() {
           });
   }*/
 
-  const deleteEmployerHandler = () =>{
-        if('' == valChangeUserEmployer || false == valChangeUserEmployer || null == valChangeUserEmployer){
-            Alert.alert(
-                'You need select any employers!.',
-              )
-        }else{
-            Alert.alert('Are you sure you want to delete this user?', '', [
-                {
-                    text: 'Cancel',
-                    onPress: () => Alert.alert('Canceled'),
-                    style: 'cancel',
-                },
-                {
-                    text: 'Yes, I Do',
-                    onPress: () => deleteEmployerFunction()
-                },
-              ],
-              {
-                cancelable: true,
-                onDismiss: () =>
-                  Alert.alert(
-                    'This alert was dismissed by tapping outside of the alert dialog.',
-                  ),
-              });
-        }
-  }//fim função
-
-  /*const deleteAcountHandler = () =>{
-        Alert.alert('Are you sure you want to delete this account?', '', [
-          {
-              text: 'Cancel',
-              onPress: () => Alert.alert('Canceled'),
-              style: 'cancel',
-          },
-          {
-              text: 'Yes, I Do',
-              onPress: () => deleteAccountFunction()
-          },
-        ],
-        {
-          cancelable: true,
-          onDismiss: () =>
-            Alert.alert(
-              'This alert was dismissed by tapping outside of the alert dialog.',
-            ),
-        });
-  }*/
-
-  /*async function deleteAccountFunction() {
-        const authDataToken = storageAccessToken
-        const authDataUserId = storageIdUser
-
-        axios.post(`${storageUrlApi}/deleteUserSelf`,{
-            authDataToken,
-            authDataUserId
-          }).then(res=>{
-
-            const resData = res.data
-
-            if(true == res.data.success){
-                //set the data
-                setAuthdata(null)
-                setPageAlertLocationData(true)
-
-            }else{
-                Alert.alert(res.data.message)
-            }
-        }).catch(error =>{
-            Alert.alert('Network Error: Please check your network connection')
-        })
-  }*/
-
   async function saveDataLocation() {
 
     let oldTxtButtonSave = txtButtonSave
@@ -353,10 +281,7 @@ export default function Home() {
         setTxtButtonSave(oldTxtButtonSave)
         setColorButtonSave(oldColorButtonSave)
         setDisabledButtonSave(oldDisabledButtonSave)
-
-      }
-
-      if(false == ifLogin){
+        Alert.alert('Data Saved')
         return
       }
 
@@ -366,6 +291,15 @@ export default function Home() {
       let data = `${newData}`
 
       dataStorage.set('listDataLocal', data)
+
+      if(false == ifLogin){
+        setTxtButtonSave(oldTxtButtonSave)
+        setColorButtonSave(oldColorButtonSave)
+        setDisabledButtonSave(oldDisabledButtonSave)
+        Alert.alert('Data Saved')
+        return
+      }
+
     }
 
     if(2 == statusEnableObs && (null == obsDescription || '' == obsDescription || false == obsDescription)){
